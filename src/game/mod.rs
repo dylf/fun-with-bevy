@@ -19,6 +19,8 @@ impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
         app.add_state::<GameState>()
             .add_event::<GameOver>()
+            .add_system(pause_game.in_schedule(OnEnter(AppState::InGame)))
+            .add_system(resume_game.in_schedule(OnExit(AppState::InGame)))
             .add_plugin(EnemyPlugin)
             .add_plugin(PlayerPlugin)
             .add_plugin(ScorePlugin)
@@ -29,7 +31,7 @@ impl Plugin for GamePlugin {
 
 #[derive(States, Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum GameState {
-    Running,
     #[default]
+    Running,
     Paused,
 }
