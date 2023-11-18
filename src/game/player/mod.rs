@@ -24,17 +24,13 @@ impl Plugin for PlayerPlugin {
         app.configure_set(PlayerSystemSet::Movement.before(PlayerSystemSet::Confinement))
             .add_system(spawn_player.in_schedule(OnEnter(AppState::InGame)))
             .add_system(despawn_player.in_schedule(OnExit(AppState::InGame)))
-            .add_system(
-                player_movement
-                    .in_set(PlayerSystemSet::Movement)
-                    .run_if(in_state(AppState::InGame))
-                    .run_if(in_state(GameState::Running)),
-            )
-            .add_system(
-                confine_player_movement
-                    .in_set(PlayerSystemSet::Confinement)
-                    .run_if(in_state(AppState::InGame))
-                    .run_if(in_state(GameState::Running)),
+            .add_systems(
+                (
+                    player_movement.in_set(PlayerSystemSet::Movement),
+                    confine_player_movement.in_set(PlayerSystemSet::Confinement),
+                )
+                    .in_set(OnUpdate(AppState::InGame))
+                    .in_set(OnUpdate(GameState::Running)),
             )
             .add_systems(
                 (player_hit_star, enemy_hit_player)
